@@ -11,9 +11,12 @@ if [[ -z $1 ]]
 }
 
 SHOW_ELEMENT() {
-    if [[ $1 = "1" || $1 = "H" || $1 = "Hydrogen" ]]; then
-        QUERY_ELEMENT=$($PSQL "SELECT p.atomic_number, el.name, el.symbol, p.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius FROM properties AS p FULL JOIN elements AS el ON p.atomic_number = el.atomic_number WHERE p.atomic_number = 1")
-
+  if [[ $1 =~ ^[0-9]+$ ]]
+  then
+        QUERY_ELEMENT=$($PSQL "SELECT p.atomic_number, el.name, el.symbol, p.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius FROM properties AS p FULL JOIN elements AS el ON p.atomic_number = el.atomic_number WHERE p.atomic_number = $1")
+  else
+        QUERY_ELEMENT=$($PSQL "SELECT p.atomic_number, el.name, el.symbol, p.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius FROM properties AS p FULL JOIN elements AS el ON p.atomic_number = el.atomic_number WHERE el.symbol='$1' OR el.name='$1'")
+  fi
         # Vars
         IFS='|' read -r ATOMIC_NUMBER NAME SYMBOL TYPE ATOMIC_MASS MELTING_POINT_CELSIUS BOILING_POINT_CELSIUS <<< "$QUERY_ELEMENT"
 
@@ -28,7 +31,6 @@ SHOW_ELEMENT() {
 
         # Echo Element info
         echo "The element with atomic number $ATOMIC_NUMBER is $NAME ($SYMBOL). It's a $TYPE, with a mass of $ATOMIC_MASS amu. $NAME has a melting point of $MELTING_POINT_CELSIUS celsius and a boiling point of $BOILING_POINT_CELSIUS celsius."
-    fi
 }
 
 
