@@ -13,9 +13,10 @@ if [[ -z $1 ]]
 SHOW_ELEMENT() {
   if [[ $1 =~ ^[0-9]+$ ]]
   then
-        QUERY_ELEMENT=$($PSQL "SELECT p.atomic_number, el.name, el.symbol, p.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius FROM properties AS p FULL JOIN elements AS el ON p.atomic_number = el.atomic_number WHERE p.atomic_number = $1")
+        QUERY_ELEMENT=$($PSQL "SELECT p.atomic_number, el.name, el.symbol, t.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius FROM properties AS p FULL JOIN elements AS el ON p.atomic_number = el.atomic_number LEFT JOIN types AS t ON p.type_id=t.type_id WHERE p.atomic_number = $1")
   else
-        QUERY_ELEMENT=$($PSQL "SELECT p.atomic_number, el.name, el.symbol, p.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius FROM properties AS p FULL JOIN elements AS el ON p.atomic_number = el.atomic_number WHERE el.symbol='$1' OR el.name='$1'")
+        QUERY_ELEMENT=$($PSQL "
+SELECT p.atomic_number, el.name, el.symbol, t.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius FROM properties AS p FULL JOIN elements AS el ON p.atomic_number = el.atomic_number LEFT JOIN types AS t ON p.type_id=t.type_id WHERE el.symbol='$1' OR el.name='$1'")
   fi
 
   if [[ -z $QUERY_ELEMENT ]]
