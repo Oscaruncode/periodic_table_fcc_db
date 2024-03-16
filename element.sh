@@ -17,6 +17,12 @@ SHOW_ELEMENT() {
   else
         QUERY_ELEMENT=$($PSQL "SELECT p.atomic_number, el.name, el.symbol, p.type, p.atomic_mass, p.melting_point_celsius, p.boiling_point_celsius FROM properties AS p FULL JOIN elements AS el ON p.atomic_number = el.atomic_number WHERE el.symbol='$1' OR el.name='$1'")
   fi
+
+  if [[ -z $QUERY_ELEMENT ]]
+  then
+      echo "I could not find that element in the database."
+      exit
+  fi
         # Vars
         IFS='|' read -r ATOMIC_NUMBER NAME SYMBOL TYPE ATOMIC_MASS MELTING_POINT_CELSIUS BOILING_POINT_CELSIUS <<< "$QUERY_ELEMENT"
 
